@@ -1,5 +1,4 @@
 import psycopg2
-import time
 from config import load_config
 from anilist_export_data import anilist_export_data, anilist_pack_data_to_db
 
@@ -46,10 +45,11 @@ while True:
         insert_anime_data(config, anime_data_packed)
     else:
         print(f"No media found on page {page}, skipping.")
+        page+=1
 
     has_next = anime_data.get("data", {}).get("Page", {}).get("pageInfo", {}).get("hasNextPage", False)
     if not has_next:
         print("All pages fetched.")
-        break
+        continue
 
     page += 1

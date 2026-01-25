@@ -94,3 +94,31 @@ def anilist_pack_data_to_db(res):
             continue
 
     return result
+
+
+# query
+# User($name: String) {
+#     User(name: $name) {
+#     name
+# id
+# mediaListOptions
+# {
+#     scoreFormat
+# }
+# favourites
+# {
+#     anime
+# {
+#     nodes
+# {
+#     title
+# {
+#     english
+# }
+# id
+#
+# }
+# }
+# }
+# }
+# }

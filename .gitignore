@@ -1,1 +1,2 @@
-app/ingestion/database_config.ini
+./
+backend/app/ingestion/database_config.ini
