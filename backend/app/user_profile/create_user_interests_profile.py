@@ -22,19 +22,22 @@ def score_multiplier(score_100):
     return 3.0
 
 
-def user_tag_profile(entry, score_format, user_tags):
+def user_tag_profile(entry, user_data, user_tags):
     tags = entry['media']['tags']
     anime_score = entry['score']
-
-    if score_format in ('POINT_10', 'POINT_10_DECIMAL'):
+    repeat_multiplier = entry["repeat"] + 1
+    user_favourites_multiplier = 1
+    if user_data['mediaListOptions']['scoreFormat'] in ('POINT_10', 'POINT_10_DECIMAL'):
         anime_score *= 10
-    elif score_format == 'POINT_5':
+    elif user_data['mediaListOptions']['scoreFormat'] == 'POINT_5':
         anime_score *= 20
-    elif score_format == 'POINT_3':
+    elif user_data['mediaListOptions']['scoreFormat'] == 'POINT_3':
         anime_score *= 33
+    for favourite in user_data["favourites"]["anime"]["nodes"]:
+        if entry["media"]["id"] == favourite["id"]:
+            user_favourites_multiplier = 2
 
     multiplier = score_multiplier(anime_score)
-
     for tag in tags:
         tag_name = tag['name']
         tag_id = tag['id']
@@ -47,17 +50,17 @@ def user_tag_profile(entry, score_format, user_tags):
                 "id": tag_id,
                 "score": 0
             }
-        user_tags[tag_name]["score"] += tag_score * get_tag_popularity_weight(tag)
+        user_tags[tag_name]["score"] += tag_score * get_tag_popularity_weight(tag) * repeat_multiplier * user_favourites_multiplier
 
 def create_user_interests_profile():
     data = get_user_data()
     entries = data['data']['MediaListCollection']['lists'][0]['entries']
-    score_format = data['data']['User']['mediaListOptions']['scoreFormat']
+    user_data = data['data']['User']
 
     user_tags = {}
 
     for entry in entries:
-        user_tag_profile(entry, score_format, user_tags)
+        user_tag_profile(entry, user_data, user_tags)
 
     normalise_tag_score(user_tags)
 
