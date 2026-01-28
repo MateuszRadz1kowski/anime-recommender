@@ -1,7 +1,7 @@
 import psycopg2
 
+from backend.config.db_settings import HOST,DATABASE,USER,PASSWORD
 from backend.scripts.tag_count import count_tags
-from config import load_config
 from anilist_export_data import anilist_export_data, anilist_pack_data_to_db
 
 INSERT_SQL = """
@@ -23,7 +23,8 @@ VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
 ON CONFLICT (id) DO NOTHING
 """
 
-def insert_anime_data(config, data):
+def insert_anime_data(data):
+    config = {'host': HOST, 'database': DATABASE, 'user': USER, 'password': PASSWORD}
     if not data:
         return
     try:
@@ -35,7 +36,6 @@ def insert_anime_data(config, data):
     except Exception as e:
         print("DB ERROR:", e)
 
-config = load_config()
 page = 1
 
 while True:
@@ -43,16 +43,12 @@ while True:
     anime_data = anilist_export_data(page)
     anime_data_packed = anilist_pack_data_to_db(anime_data)
 
-    if anime_data_packed:
-        count_tags(anime_data_packed)
-        insert_anime_data(config, anime_data_packed)
-    else:
-        print(f"No media found on page {page}, skipping.")
-        page+=1
+    count_tags(anime_data_packed)
+    insert_anime_data(anime_data_packed)
 
     has_next = anime_data.get("data", {}).get("Page", {}).get("pageInfo", {}).get("hasNextPage", False)
     if not has_next:
         print("All pages fetched.")
-        continue
+        break
 
     page += 1
