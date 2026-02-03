@@ -16,37 +16,40 @@ def create_user_interests_profile():
 
     for entry in entries:
         user_tag_profile(entry, user_data, user_tags)
-        user_genre_profile(entry,user_data,user_genres)
+        user_genre_profile(entry, user_data, user_genres)
 
-    normalise_score(user_tags)
-    normalise_score(user_genres)
-    sorted_tags = sorted(
-        user_tags.items(),
-        key=lambda x: x[1]['score'],
-        reverse=True
-    )
+    user_tags = normalise_score(user_tags)
+    user_genres = normalise_score(user_genres)
 
-    sorted_genres = sorted(
-        user_genres.items(),
-        key=lambda x: x[1]['score'],
-        reverse=True
-    )
+    user_tags = sort_interests(user_tags)
+    user_genres = sort_interests(user_genres)
 
-    print(sorted_tags)
-    print(sorted_genres)
+    print(user_tags)
+    print(user_genres)
 
 
 def normalise_score(user_interests):
     sum_sq = 0.0
-    for i in user_interests.values():
-        sum_sq += i["score"] ** 2
+
+    for value in user_interests.values():
+        sum_sq += value ** 2
 
     norm = math.sqrt(sum_sq)
 
-    for i in user_interests.values():
-        i["score"] /= norm
+    for key in user_interests:
+        user_interests[key] = user_interests[key] / norm
 
     return user_interests
+
+
+def sort_interests(user_interests):
+    return dict(
+        sorted(
+            user_interests.items(),
+            key=lambda x: x[1],
+            reverse=True
+        )
+    )
 
 create_user_interests_profile()
 

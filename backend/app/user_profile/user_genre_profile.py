@@ -1,24 +1,34 @@
-from backend.config.reccomender_values_settings import REPEAT_MULTIPLIER, USER_FAVOURITES_MULTIPLIER, score_multiplier
+from backend.config.reccomender_values_settings import (
+    REPEAT_MULTIPLIER,
+    USER_FAVOURITES_MULTIPLIER,
+    score_multiplier
+)
 
+def user_genre_profile(entry, user_data, user_genres):
+    anime_score = entry["score"]
+    if anime_score == 0:
+        return
 
-def user_genre_profile(entry,user_data,user_genres):
-    genres = entry['media']['genres']
-    anime_score = entry['score']
+    genres = entry["media"]["genres"]
     repeat_multiplier = entry["repeat"] + REPEAT_MULTIPLIER
-    user_favourites_multiplier = 1
-    if user_data['mediaListOptions']['scoreFormat'] in ('POINT_10', 'POINT_10_DECIMAL'):
+    favourites_multiplier = 1
+
+    score_format = user_data["mediaListOptions"]["scoreFormat"]
+    if score_format in ("POINT_10", "POINT_10_DECIMAL"):
         anime_score *= 10
-    elif user_data['mediaListOptions']['scoreFormat'] == 'POINT_5':
+    elif score_format == "POINT_5":
         anime_score *= 20
-    elif user_data['mediaListOptions']['scoreFormat'] == 'POINT_3':
+    elif score_format == "POINT_3":
         anime_score *= 33
-    for favourite in user_data["favourites"]["anime"]["nodes"]:
-        if entry["media"]["id"] == favourite["id"]:
-            user_favourites_multiplier = USER_FAVOURITES_MULTIPLIER
+
     multiplier = score_multiplier(anime_score)
+
+    for fav in user_data["favourites"]["anime"]["nodes"]:
+        if entry["media"]["id"] == fav["id"]:
+            favourites_multiplier = USER_FAVOURITES_MULTIPLIER
+            break
+
     for genre in genres:
-        if genre not in user_genres:
-            user_genres[genre] = {
-                "score": 0
-            }
-        user_genres[genre]["score"] += 1 * multiplier * repeat_multiplier * user_favourites_multiplier
+        user_genres[genre] = user_genres.get(genre, 0) + (
+            multiplier * repeat_multiplier * favourites_multiplier
+        )
