@@ -1,0 +1,29 @@
+Reccomendations alghorithm
+    anime_profile
+        mnozenie wyniku anime przez:
+            popularnosc
+            favourites
+            mean score
+            reccomendations - gdy uzytkownik oberzal i dobrze ocenil dane anime z rekomendaci to boost
+            gdy status planning u usera lekki boost
+            negatywne punkty gdy nie lubi
+            nie pokazuje tego co uzytkownik uz obejrzal
+        filtry:
+            isAdult
+            format
+            season year
+            czy status planning pokazywac
+            czy pokazywac nastepne sezony danego anime, np aot s1 aot s2 itp
+            rozne sortowanie
+            jakis tryb z bardzo dziwnymi ciekawymi nietypowymi rekomendacjami
+
+pokazywanie anime dlaczego jest polecane
+user moze sam zmieniac waznosc danej zeczy przy polecaniu, np popularnosc jest wazniejsza
+filtrowanie przez profil MAL
+zrobic api z endpoitami wszstkimi
+frontend gdzie wszystko sie wyswietla
+user moze manualnie dodac ze bardzo lubi/nie lubi danego tagu/genre
+manualnie pokazane jakie tagi i genre user lubi
+user moze podac ze aktualnie szuka daneg typu anime np seinen i dostae to wielkiego boosta
+statystyki dla mojego wglądu
+naprawic: im wiecej tagow ma anime tym wieksza przewaga
