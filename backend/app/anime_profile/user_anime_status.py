@@ -1,4 +1,4 @@
-from backend.app.user_profile.get_user_data import get_user_data
+from backend.app.db.get_data.get_user_data import get_user_data
 
 
 def user_anime_status(status_number):

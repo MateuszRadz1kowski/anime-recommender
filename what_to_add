@@ -3,7 +3,7 @@ Reccomendations alghorithm
         mnozenie wyniku anime przez:
             negatywne punkty gdy nie lubi
         filtry:
-            czy pokazywac nastepne sezony danego anime, np aot s1 aot s2 itp
+            czy pokazywac nastepne sezony danego anime, np aot s1 aot s2 itp - z api poprzez relations: nie pokazuje od razu wszystkich sequeli, trzeba by wejsc anime->sequel1->sequel2 i az nie bedzie nic z relacją sequel, np aot s1 -> aot s2 -> aot s3 az do konca
             rozne sortowanie
             jakis tryb z bardzo dziwnymi ciekawymi nietypowymi rekomendacjami
 
@@ -16,4 +16,15 @@ user moze manualnie dodac ze bardzo lubi/nie lubi danego tagu/genre
 manualnie pokazane jakie tagi i genre user lubi
 user moze podac ze aktualnie szuka daneg typu anime np seinen i dostae to wielkiego boosta
 statystyki dla mojego wglądu
-naprawic: im wiecej tagow ma anime tym wieksza przewaga
+
+dane do zawarcia w finalnej liscie rekomendacji:
+    title {english}
+    score po normalizacji np 0.22
+    dlaczego dane anime zostalo polecone np: bo tag kaiju, battle royal
+    description
+    episodes
+    format
+    coverImage {extraLarge}
+    trailer {id,site}
+    seasonYear
+    season

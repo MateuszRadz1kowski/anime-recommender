@@ -3,7 +3,7 @@ import math
 from backend.app.user_profile.completed_anime_reccomendations_ import create_completed_anime_recommendations
 from backend.app.user_profile.create_user_tag_profile import user_tag_profile
 from backend.app.user_profile.user_genre_profile import user_genre_profile
-from backend.app.user_profile.get_user_data import get_user_data
+from backend.app.db.get_data.get_user_data import get_user_data
 
 def create_user_interests_profile():
     data = get_user_data()

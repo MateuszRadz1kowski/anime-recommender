@@ -17,9 +17,17 @@ INSERT INTO anime_data (
     recommendations,
     popularity,
     favourites,
-    mean_score
+    mean_score,
+    description,
+    episode_number,
+    cover_image,
+    trailer_id,
+    trailer_site,
+    season
+    
+    
 )
-VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
 ON CONFLICT (id) DO NOTHING
 """
 
@@ -52,3 +60,4 @@ while True:
         break
 
     page += 1
+insert_anime_data(anilist_pack_data_to_db(anilist_export_data(1)))

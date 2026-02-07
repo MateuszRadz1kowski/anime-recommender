@@ -51,7 +51,7 @@ def create_anime_profile(db_response,user_interests_profile):
             key=lambda x: x[1],
             reverse=True
         )
-    print(sorted_anime_profile)
+    return sorted_anime_profile
 
 def normalise_score(anime):
     sum_sq = 0.0
