@@ -1,11 +1,22 @@
+"use client";
 import Image from "next/image";
 import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+	const router = useRouter();
+
+	const localHostSetUsername = (e) => {
+		const username = e.target.previousElementSibling.value;
+		console.log(username);
+		localStorage.setItem("username", username);
+		router.push("/recommendations");
+	};
+
 	return (
 		<div className="min-h-screen bg-zinc-950 flex items-center justify-center px-4">
 			<Card className="w-full max-w-2xl shadow-xl border-zinc-800 bg-zinc-900">
@@ -42,7 +53,10 @@ export default function LoginPage() {
 									placeholder="Enter your MyAnimeList username"
 									className="bg-zinc-800 border-zinc-700 text-white"
 								/>
-								<Button className="bg-white text-black hover:bg-zinc-200">
+								<Button
+									className="bg-white text-black hover:bg-zinc-200"
+									onClick={(e) => localHostSetUsername(e)}
+								>
 									<Search size={18} />
 								</Button>
 							</div>
@@ -54,7 +68,10 @@ export default function LoginPage() {
 									placeholder="Enter your AniList username"
 									className="bg-zinc-800 border-zinc-700 text-white"
 								/>
-								<Button className="bg-white text-black hover:bg-zinc-200">
+								<Button
+									className="bg-white text-black hover:bg-zinc-200"
+									onClick={(e) => localHostSetUsername(e)}
+								>
 									<Search size={18} />
 								</Button>
 							</div>

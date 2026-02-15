@@ -1,9 +1,15 @@
+"use client";
 import LoginPage from "./loginPage/page";
+import Recommendations from "./recommendations/page";
 
 export default function Home() {
 	return (
 		<div>
-			<LoginPage />
+			{localStorage.getItem("username") != null ? (
+				<Recommendations />
+			) : (
+				<LoginPage />
+			)}
 		</div>
 	);
 }
