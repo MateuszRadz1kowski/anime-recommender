@@ -20,3 +20,9 @@ statystyki dla mojego wglądu
 dane do zawarcia w finalnej liscie rekomendacji:
     score po normalizacji np 0.22
     dlaczego dane anime zostalo polecone np: bo tag kaiju, battle royal
+
+
+frontend:
+    dark mode
+    tooltip - shadcn
+    
