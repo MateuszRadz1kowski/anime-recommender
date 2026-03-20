@@ -26,10 +26,6 @@ import { Slider } from "../ui/slider";
 import { useState } from "react";
 
 export default function FilterPage() {
-	const [sequelsChecked, setSequelsChecked] = useState(true);
-	const [experimentalModeChecked, setExperimentalModeChecked] = useState(false);
-	const [showAdultChecked, setShowAdultChecked] = useState(true);
-
 	const tags = [
 		"Psychological",
 		"Time Travel",
@@ -53,9 +49,11 @@ export default function FilterPage() {
 		min_year: null,
 		max_year: null,
 		min_score: null,
-		studios: null,
-		tags: null,
-		genres: null,
+		show_selected_studios: [],
+		show_selected_tags: [],
+		hide_selected_tags: [],
+		show_selected_genres: [],
+		hide_selected_genres: [],
 		media_type: null,
 	});
 
@@ -70,7 +68,7 @@ export default function FilterPage() {
 		min_year: 1900,
 		max_year: new Date().getFullYear(),
 		min_score: 0,
-		studios: [null],
+		show_selected_studios: [null],
 		tags: [null],
 		genres: [null],
 		media_type: ["Anime", "Movie", "OVA"],
@@ -81,10 +79,11 @@ export default function FilterPage() {
 			...prev,
 			[key]: value,
 		}));
+		console.log("Updated filters:", { ...filters, [key]: value });
 	};
 
 	const handleCheckbox = (key, checked) => {
-		if (checked === defaultValues[key]) {
+		if (checked == defaultValues[key]) {
 			updateFilter(key, null);
 		} else {
 			updateFilter(key, checked);
@@ -103,7 +102,7 @@ export default function FilterPage() {
 		fetch(`http://127.0.0.1:8000/recommendations_data?${queryString}`)
 			.then((res) => res.json())
 			.then((data) => {
-				console.log("Odpowiedź:", data);
+				console.log(data);
 			});
 	};
 
@@ -148,7 +147,6 @@ export default function FilterPage() {
 			</div>
 
 			<Card className="bg-[#0f172a] border border-slate-800 p-6 space-y-4">
-				{/* SHOW SEQUELS */}
 				<div className="flex items-center gap-3">
 					<Checkbox
 						checked={filters.show_sequels ?? defaultValues.show_sequels}
@@ -159,7 +157,6 @@ export default function FilterPage() {
 					<Label>Show sequels</Label>
 				</div>
 
-				{/* EXPERIMENTAL MODE */}
 				<div className="flex items-center gap-3">
 					<Checkbox
 						checked={
@@ -172,7 +169,6 @@ export default function FilterPage() {
 					<Label>Experimental mode</Label>
 				</div>
 
-				{/* SHOW 18+ */}
 				<div className="flex items-center gap-3">
 					<Checkbox
 						checked={filters.show_adult ?? defaultValues.show_adult}
@@ -183,7 +179,6 @@ export default function FilterPage() {
 			</Card>
 
 			<Card className="mt-6 bg-[#0f172a] border border-slate-800 p-6 space-y-4">
-				{/* TAG IMPORTANCE */}
 				<div>
 					<Select
 						value={filters.tag_importance ?? ""}
@@ -202,7 +197,6 @@ export default function FilterPage() {
 					</Select>
 				</div>
 
-				{/* POPULARITY IMPORTANCE */}
 				<div>
 					<Select
 						value={filters.popularity_importance ?? ""}
@@ -225,7 +219,6 @@ export default function FilterPage() {
 			</Card>
 
 			<Card className="mt-6 bg-[#0f172a] border border-slate-800 p-6 space-y-4">
-				{/* EPISODES */}
 				<Input
 					type="number"
 					placeholder="Minimum episodes"
@@ -257,24 +250,40 @@ export default function FilterPage() {
 						type="number"
 						placeholder="Minimum release year (e.g. 2005)"
 						className="bg-slate-900 border-slate-700 text-slate-100 placeholder:text-slate-500"
+						onChange={(e) =>
+							updateFilter(
+								"min_year",
+								e.target.value ? Number(e.target.value) : null,
+							)
+						}
 					/>
 					<Input
 						type="number"
 						placeholder="Maximum release year (e.g. 2023)"
 						className="mt-3 bg-slate-900 border-slate-700 text-slate-100 placeholder:text-slate-500"
+						onChange={(e) =>
+							updateFilter(
+								"max_year",
+								e.target.value ? Number(e.target.value) : null,
+							)
+						}
 					/>
-					<Button className="mt-2 bg-purple-600 hover:bg-purple-500">
-						Apply Release Year Filter
-					</Button>
 				</div>
 			</Card>
 
 			<Card className="mt-6 bg-[#0f172a] border border-slate-800 text-slate-100 p-6 space-y-6">
 				<div>
 					<Label className="mb-2 text-slate-300">
-						Show items with mean score at least:
+						Show items with mean score at least:{" "}
+						{filters.min_score ?? defaultValues.min_score}
 					</Label>
-					<Slider defaultValue={[75]} max={100} step={1} className="w-full" />
+					<Slider
+						defaultValue={[75]}
+						max={100}
+						step={1}
+						className="w-full"
+						onValueChange={(e) => updateFilter("min_score", e[0] ? e[0] : null)}
+					/>
 				</div>
 
 				<div>
@@ -294,9 +303,6 @@ export default function FilterPage() {
 							</ComboboxList>
 						</ComboboxContent>
 					</Combobox>
-					<Button className="mt-2 bg-purple-600 hover:bg-purple-500">
-						Add Studio
-					</Button>
 				</div>
 
 				<div>
@@ -356,10 +362,19 @@ export default function FilterPage() {
 				</div>
 
 				<div>
-					<Select>
+					<Select
+						value={filters.media_type?.[0] ?? ""}
+						onValueChange={(value) =>
+							setFilters((prev) => ({
+								...prev,
+								media_type: [value],
+							}))
+						}
+					>
 						<SelectTrigger className="w-[200px] bg-slate-900 border-slate-700 text-slate-100">
 							<SelectValue placeholder="Select media type" />
 						</SelectTrigger>
+
 						<SelectContent>
 							<SelectGroup>
 								<SelectItem value="anime">Anime</SelectItem>

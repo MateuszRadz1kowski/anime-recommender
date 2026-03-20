@@ -7,7 +7,7 @@ Reccomendations alghorithm
             rozne sortowanie
             jakis tryb z bardzo dziwnymi ciekawymi nietypowymi rekomendacjami
             user moze manualnie dodac ze bardzo lubi/nie lubi danego tagu/genre
-            user moze podac ze aktualnie szuka daneg typu anime np seinen i dostae to wielkiego boosta
+            x.user moze podac ze aktualnie szuka daneg typu anime np seinen i dostae to wielkiego boosta
             edytowaie jak bardzo wazne sa genre i tagi przy polecaniu
             opcje jak bardzo jest wazny pozytywny user score w porowananiu z negatywnym scorem, tak samo z meanscore
             opcje jak duzy boost jest planowanych anime przez usera

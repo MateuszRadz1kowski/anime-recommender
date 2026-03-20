@@ -32,13 +32,16 @@ async def get_recommendations(
 
     min_mean_score: int = Query(0),
 
-    studios: Optional[List[str]] = Query(None),
-    tags: Optional[List[str]] = Query(None),
-    genres: Optional[List[str]] = Query(None),
+    show_selected_studios: Optional[List[str]] = Query(None),
+    show_selected_tags: Optional[List[str]] = Query(None),
+    hide_selected_tags: Optional[List[str]] = Query(None),
+    show_selected_genres: Optional[List[str]] = Query(None),
+    hide_selected_genres: Optional[List[str]] = Query(None),
+
 
     media_types: Optional[List[str]] = Query(["Anime", "Movie", "OVA"])
 ):
-    print(show_sequels, experimental_mode, show_18_rated, tag_importance, popularity_importance, min_number_episodes, max_number_episodes, min_release_year, max_release_year, min_mean_score, studios, tags, genres, media_types)
+    print(show_sequels, experimental_mode, show_18_rated, tag_importance, popularity_importance, min_number_episodes, max_number_episodes, min_release_year, max_release_year, min_mean_score, show_selected_studios, show_selected_tags, hide_selected_tags, show_selected_genres, hide_selected_genres, media_types)
     data = prepare_dictionary()
 
     return data
