@@ -47,3 +47,11 @@ def check_show_planning(anime,anime_planning):
         else:
             return True
     return None
+
+def check_mean_score(anime,min_mean_score):
+    if anime[11] is not None:
+        if anime[11] >= min_mean_score:
+            return True
+        else:
+            return False
+    return None
