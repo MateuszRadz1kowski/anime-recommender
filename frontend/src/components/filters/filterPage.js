@@ -101,17 +101,17 @@ export default function FilterPage({ onDataUpdate, onLoadingChange }) {
 			const queryString = searchParams.toString();
 			console.log("Wysyłam do API:", queryString);
 
-			const res = await fetch(
-				`https://unloving-stilt-bully.ngrok-free.dev/recommendations_data/?${queryString}`,
-				{
-					method: "GET",
-					headers: {
-						"Content-Type": "application/json",
-						"ngrok-skip-browser-warning": "true",
-					},
-				},
-			);
+			const baseEnvUrl = process.env.NEXT_PUBLIC_API_URL;
 
+			const apiUrl = new URL("/recommendations_data/", baseEnvUrl);
+
+			const res = await fetch(`${apiUrl.href}?${queryString}`, {
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+					"ngrok-skip-browser-warning": "true",
+				},
+			});
 			const data = await res.json();
 			console.log("Otrzymałem dane z API:", data);
 			onDataUpdate(Object.values(data));
