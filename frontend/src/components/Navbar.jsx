@@ -88,7 +88,16 @@ export default function Navbar({ activeTab, onTabChange, apiData }) {
                 </Button>
               </DropdownMenuTrigger>
               
-              <DropdownMenuContent align="end" className="w-48 bg-[#0d1829] border-white/10 text-slate-300">
+             <DropdownMenuContent align="end" className="w-48 bg-[#0d1829] border-white/10 text-slate-300">
+                <DropdownMenuLabel className="text-[10px] uppercase font-bold tracking-wider text-slate-500">My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator className="bg-white/5" />
+                <DropdownMenuItem className="text-xs cursor-pointer focus:bg-white/5 focus:text-white" onClick={() => onTabChange("discover")}>
+                  <Settings className="mr-2 size-3.5" /> Discovery Mode
+                </DropdownMenuItem>
+                <DropdownMenuItem className="text-xs cursor-pointer focus:bg-white/5 focus:text-white" onClick={() => onTabChange("stats")}>
+                  <User className="mr-2 size-3.5" /> Profile Stats
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-white/5" />
                 <DropdownMenuItem 
                   onClick={handleLogout}
                   className="text-xs focus:bg-red-500/10 focus:text-red-400 text-red-400/80 cursor-pointer"

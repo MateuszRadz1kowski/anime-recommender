@@ -2,8 +2,8 @@
 
 import { useMemo } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { BarChart3 } from "lucide-react";
+import { SectionError } from "@/components/ErrorBanner";
 
 const GENRE_COLOURS = [
 	"#a855f7",
@@ -32,6 +32,22 @@ export default function GenreAffinityMap({ interests }) {
 			}));
 	}, [interests]);
 
+	if (!interests || topGenres.length == 0) {
+		return (
+			<Card className="bg-[#0a0f1d]/85 border border-white/[0.05] mb-4">
+				<CardHeader className="text-sm font-bold uppercase text-white tracking-wider">
+					Genre Affinity Map
+				</CardHeader>
+				<CardContent>
+					<SectionError
+						errorCode="empty_list"
+						message="Brak danych gatunków do wyświetlenia."
+					/>
+				</CardContent>
+			</Card>
+		);
+	}
+
 	return (
 		<Card className="bg-[#0a0f1d]/85 border border-white/[0.05] text-slate-100 overflow-hidden shadow-xl backdrop-blur-md h-full">
 			<CardHeader className="px-6 pt-5 pb-4 border-b border-white/[0.02]">
@@ -42,7 +58,6 @@ export default function GenreAffinityMap({ interests }) {
 					</h3>
 				</div>
 			</CardHeader>
-
 			<CardContent className="px-6 py-6 space-y-5">
 				<div className="space-y-2 max-h-[220px] overflow-y-auto pr-1 scrollbar-thin">
 					{topGenres.map((genre) => (
@@ -54,7 +69,7 @@ export default function GenreAffinityMap({ interests }) {
 								<div
 									className="h-full rounded-full transition-all duration-1000 ease-out"
 									style={{
-										width: `${(genre.value / topGenres[0].value) * 100}%`,
+										width: `${(genre.value / (topGenres[0]?.value || 1)) * 100}%`,
 										background: `linear-gradient(90deg, ${genre.fill}88, ${genre.fill})`,
 									}}
 								/>

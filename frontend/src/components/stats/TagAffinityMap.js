@@ -33,6 +33,22 @@ export default function TagAffinityMap({ interests }) {
 			}));
 	}, [interests]);
 
+	if (!interests || topTags.length == 0) {
+		return (
+			<Card className="bg-[#0a0f1d]/85 border border-white/[0.05] mb-4">
+				<CardHeader className="text-sm font-bold uppercase text-white tracking-wider">
+					Tag Affinity Map
+				</CardHeader>
+				<CardContent>
+					<SectionError
+						errorCode="empty_list"
+						message="No data available to display"
+					/>
+				</CardContent>
+			</Card>
+		);
+	}
+
 	return (
 		<Card className="bg-[#0a0f1d]/85 border border-white/[0.05] text-slate-100 overflow-hidden shadow-xl backdrop-blur-md h-full">
 			<CardHeader className="px-6 pt-5 pb-4 border-b border-white/[0.02]">

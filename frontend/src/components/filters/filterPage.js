@@ -11,29 +11,44 @@ import TagsChoser from "./tagSelector";
 import GenreChoser from "./genreSelector";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Sparkles, SlidersHorizontal, RotateCcw } from "lucide-react";
+import { useToast } from "@/components/useToast";
+import { parseApiError } from "@/components/ErrorBanner";
 
 function FilterSection({ label, children }) {
 	return (
 		<div className="space-y-3 group/section">
-			<p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.15em] group-hover/section:text-violet-400/80 transition-colors duration-300">
-				{label}
-			</p>
+			{label && (
+				<p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.15em] group-hover/section:text-violet-400/80 transition-colors duration-300">
+					{label}
+				</p>
+			)}
 			<div className="relative">{children}</div>
 		</div>
 	);
 }
 
+const ERROR_MESSAGES = {
+	user_not_found: { title: "User Not Found", type: "error" },
+	private_profile: { title: "Private Profile", type: "warning" },
+	empty_list: { title: "Empty Anime List", type: "warning" },
+	server_error: { title: "Server Error", type: "error" },
+	db_error: { title: "Database Unavailable", type: "error" },
+	network_error: { title: "Connection Failed", type: "error" },
+	rate_limit: { title: "Too Many Requests", type: "warning" },
+};
+
 export default function FilterPage({
 	apiData,
 	onDataUpdate,
 	onLoadingChange,
+	onError,
 	filters,
 	setFilters,
 }) {
+	const { toast } = useToast();
 	const [tagsSwitchStatus, setTagsSwitchStatus] = useState(true);
 	const [genreSwitchStatus, setGenreSwitchStatus] = useState(true);
 	const [disableClear, setDisableClear] = useState(true);
-
 	const [cooldown, setCooldown] = useState(0);
 
 	const defaultValues = {
@@ -77,15 +92,16 @@ export default function FilterPage({
 		if (cooldown > 0) return;
 
 		onLoadingChange(true);
+		onError(null);
 		setCooldown(5);
 
 		try {
 			const searchParams = new URLSearchParams();
-			searchParams.append("username", localStorage.getItem("username"));
-			searchParams.append("platform", localStorage.getItem("platform"));
+			searchParams.append("username", localStorage.getItem("username") || "");
+			searchParams.append("platform", localStorage.getItem("platform") || "");
+
 			Object.entries(filters).forEach(([key, value]) => {
 				if (value == null || value == undefined) return;
-
 				if (Array.isArray(value)) {
 					value.forEach((item) => {
 						if (item) searchParams.append(key, item);
@@ -95,24 +111,72 @@ export default function FilterPage({
 				}
 			});
 
-			const queryString = searchParams.toString();
-			console.log("Wysyłam do API:", queryString);
-
-			const baseEnvUrl = process.env.NEXT_PUBLIC_API_URL;
-			const apiUrl = new URL("/recommendations_data/", baseEnvUrl);
-
-			const res = await fetch(`${apiUrl.href}?${queryString}`, {
+			const apiUrl = new URL(
+				"/recommendations_data/",
+				process.env.NEXT_PUBLIC_API_URL,
+			);
+			const res = await fetch(`${apiUrl.href}?${searchParams.toString()}`, {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
 					"ngrok-skip-browser-warning": "true",
 				},
+				signal: AbortSignal.timeout(60000),
 			});
+
 			const data = await res.json();
-			console.log("Otrzymałem dane z API:", data);
-			onDataUpdate(Object.values(data));
+
+			if (!res.ok) {
+				const { code, message } = parseApiError(data);
+				const config = ERROR_MESSAGES[code] || {
+					title: "Error",
+					type: "error",
+				};
+
+				toast({
+					type: config.type,
+					title: config.title,
+					message: message || `Something went wrong (${code})`,
+					duration: code == "rate_limit" ? 8000 : 6000,
+				});
+
+				onError({ code, message });
+				onDataUpdate([]);
+				return;
+			}
+
+			const results = Object.values(data);
+			onDataUpdate(results);
+
+			if (results.length == 0) {
+				toast({
+					type: "info",
+					title: "No Results",
+					message:
+						"No anime matched your current filters. Try relaxing some constraints.",
+					duration: 5000,
+				});
+			}
 		} catch (error) {
-			console.error("Error fetching recommendations:", error);
+			let code = "network_error";
+			let message = "Could not reach the server. Check your connection.";
+
+			if (error.name == "TimeoutError" || error.name == "AbortError") {
+				code = "network_error";
+				message = "The request timed out. The server might be busy.";
+			} else if (error.message === "non_json_response") {
+				code = "server_error";
+				message = "Server returned an unexpected response.";
+			}
+
+			toast({
+				type: "error",
+				title: ERROR_MESSAGES[code]?.title || "Connection Failed",
+				message,
+				duration: 7000,
+			});
+			onError({ code, message });
+			onDataUpdate([]);
 		} finally {
 			onLoadingChange(false);
 		}
@@ -263,13 +327,13 @@ export default function FilterPage({
 						}
 						className="gap-2"
 					>
-						{["low", "medium", "high"].map((influenceLevel) => (
+						{["low", "medium", "high"].map((level) => (
 							<ToggleGroupItem
-								key={influenceLevel}
-								value={influenceLevel}
+								key={level}
+								value={level}
 								className={toogleGroupItemClassName}
 							>
-								{influenceLevel}
+								{level}
 							</ToggleGroupItem>
 						))}
 					</ToggleGroup>
@@ -281,36 +345,32 @@ export default function FilterPage({
 					}
 				>
 					<div className="flex gap-3 flex-col">
-						<div className="relative flex-1">
-							<Input
-								type="number"
-								placeholder="Min"
-								value={filters.min_number_episodes ?? ""}
-								min="0"
-								onChange={(e) =>
-									updateFilter(
-										"min_number_episodes",
-										e.target.value ? Number(e.target.value) : null,
-									)
-								}
-								className="h-10 text-xs bg-white/3 border-white/8 focus:ring-1 focus:ring-violet-500/30 focus:border-violet-500/50 transition-all rounded-lg"
-							/>
-						</div>
-						<div className="relative flex-1">
-							<Input
-								type="number"
-								placeholder="Max"
-								value={filters.max_number_episodes ?? ""}
-								min="0"
-								onChange={(e) =>
-									updateFilter(
-										"max_number_episodes",
-										e.target.value ? Number(e.target.value) : null,
-									)
-								}
-								className="h-10 text-xs bg-white/3 border-white/8 focus:ring-1 focus:ring-violet-500/30 focus:border-violet-500/50 transition-all rounded-lg"
-							/>
-						</div>
+						<Input
+							type="number"
+							placeholder="Min"
+							value={filters.min_number_episodes ?? ""}
+							min="0"
+							onChange={(e) =>
+								updateFilter(
+									"min_number_episodes",
+									e.target.value ? Number(e.target.value) : null,
+								)
+							}
+							className="h-10 text-xs bg-white/3 border-white/8 focus:ring-1 focus:ring-violet-500/30 focus:border-violet-500/50 transition-all rounded-lg"
+						/>
+						<Input
+							type="number"
+							placeholder="Max"
+							value={filters.max_number_episodes ?? ""}
+							min="0"
+							onChange={(e) =>
+								updateFilter(
+									"max_number_episodes",
+									e.target.value ? Number(e.target.value) : null,
+								)
+							}
+							className="h-10 text-xs bg-white/3 border-white/8 focus:ring-1 focus:ring-violet-500/30 focus:border-violet-500/50 transition-all rounded-lg"
+						/>
 					</div>
 				</FilterSection>
 
@@ -327,7 +387,7 @@ export default function FilterPage({
 									e.target.value ? Number(e.target.value) : null,
 								)
 							}
-							className="h-10 text-xs bg-white/[3 border-white/8 focus:border-violet-500/50"
+							className="h-10 text-xs bg-white/3 border-white/8 focus:border-violet-500/50"
 						/>
 						<Input
 							type="number"
@@ -342,94 +402,91 @@ export default function FilterPage({
 							}
 							className="h-10 text-xs bg-white/3 border-white/8 focus:border-violet-500/50"
 						/>
-
-						<FilterSection label={`Min score: ${filters.min_mean_score ?? 0}%`}>
-							<div className="pt-2 px-1">
-								<Slider
-									max={100}
-									step={1}
-									value={[filters.min_mean_score ?? 0]}
-									onValueChange={(e) =>
-										updateFilter("min_mean_score", e[0] ? e[0] : null)
-									}
-									className="[&_[role=slider]]:h-4 [&_[role=slider]]:w-4 [&_[role=slider]]:bg-white [&_[role=slider]]:border-2 [&_[role=slider]]:border-violet-500 [&_.bg-primary]:bg-violet-500 [&_.bg-secondary]:bg-white/10"
-								/>
-							</div>
-						</FilterSection>
-
-						<FilterSection label="Tags Selection">
-							<div className="bg-white/[0.01] rounded-xl border border-white/[0.03] p-1 shadow-inner">
-								<TagsChoser
-									setTagsSwitchStatus={setTagsSwitchStatus}
-									tagsSwitchStatus={tagsSwitchStatus}
-									updateFilter={updateFilter}
-									filters={filters}
-								/>
-							</div>
-						</FilterSection>
-
-						<FilterSection label="Genres Selection">
-							<div className="bg-white/[0.01] rounded-xl border border-white/[0.03] p-1 shadow-inner">
-								<GenreChoser
-									setGenreSwitchStatus={setGenreSwitchStatus}
-									genreSwitchStatus={genreSwitchStatus}
-									updateFilter={updateFilter}
-									filters={filters}
-								/>
-							</div>
-						</FilterSection>
-
-						{(filters.media_types === "TV" || filters.media_types == null) && (
-							<FilterSection label="Streaming Services">
-								<ToggleGroup
-									type="single"
-									value={filters.show_streaming_service ?? ""}
-									onValueChange={(v) =>
-										updateFilter(
-											"show_streaming_service",
-											v === "All" ? null : v,
-										)
-									}
-									className="gap-2.5"
-								>
-									<ToggleGroupItem
-										value="Netflix"
-										className={toogleGroupItemClassName}
-									>
-										Netflix
-									</ToggleGroupItem>
-									<ToggleGroupItem
-										value="Crunchyroll"
-										className={toogleGroupItemClassName}
-									>
-										Crunchyroll
-									</ToggleGroupItem>
-								</ToggleGroup>
-							</FilterSection>
-						)}
-					</div>
-
-					<div className="flex-shrink-0 p-6 pb-8 bg-[#060d1b]/95 backdrop-blur-md border-t border-white/[0.08] shadow-[0_-10px_30px_rgba(0,0,0,0.5)] z-20">
-						<div className="flex gap-3">
-							<Button
-								onClick={handleApply}
-								disabled={cooldown > 0}
-								className="flex-[2.5] h-11 bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs rounded-xl transition-all duration-300 hover:shadow-[0_0_25px_rgba(139,92,246,0.5)] hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2"
-							>
-								<SlidersHorizontal size={14} />
-								{cooldown > 0 ? `Wait ${cooldown}s...` : "Apply Filters"}
-							</Button>
-							<Button
-								onClick={handleClear}
-								variant="outline"
-								disabled={!disableClear}
-								className="disabled:bg-slate-800 flex-1 h-11 border-white/10 bg-white/[20 hover:bg-white/[8 hover:border-white/[20 text-slate-400 rounded-xl transition-all duration-300"
-							>
-								<RotateCcw size={14} />
-							</Button>
-						</div>
 					</div>
 				</FilterSection>
+
+				<FilterSection label={`Min score: ${filters.min_mean_score ?? 0}%`}>
+					<div className="pt-2 px-1">
+						<Slider
+							max={100}
+							step={1}
+							value={[filters.min_mean_score ?? 0]}
+							onValueChange={(e) =>
+								updateFilter("min_mean_score", e[0] ? e[0] : null)
+							}
+							className="[&_[role=slider]]:h-4 [&_[role=slider]]:w-4 [&_[role=slider]]:bg-white [&_[role=slider]]:border-2 [&_[role=slider]]:border-violet-500 [&_.bg-primary]:bg-violet-500 [&_.bg-secondary]:bg-white/10"
+						/>
+					</div>
+				</FilterSection>
+
+				<FilterSection label="Tags Selection">
+					<div className="bg-white/[0.01] rounded-xl border border-white/[0.03] p-1 shadow-inner">
+						<TagsChoser
+							setTagsSwitchStatus={setTagsSwitchStatus}
+							tagsSwitchStatus={tagsSwitchStatus}
+							updateFilter={updateFilter}
+							filters={filters}
+						/>
+					</div>
+				</FilterSection>
+
+				<FilterSection label="Genres Selection">
+					<div className="bg-white/[0.01] rounded-xl border border-white/[0.03] p-1 shadow-inner">
+						<GenreChoser
+							setGenreSwitchStatus={setGenreSwitchStatus}
+							genreSwitchStatus={genreSwitchStatus}
+							updateFilter={updateFilter}
+							filters={filters}
+						/>
+					</div>
+				</FilterSection>
+
+				{(filters.media_types == "TV" || filters.media_types == null) && (
+					<FilterSection label="Streaming Services">
+						<ToggleGroup
+							type="single"
+							value={filters.show_streaming_service ?? ""}
+							onValueChange={(v) =>
+								updateFilter("show_streaming_service", v === "All" ? null : v)
+							}
+							className="gap-2.5"
+						>
+							<ToggleGroupItem
+								value="Netflix"
+								className={toogleGroupItemClassName}
+							>
+								Netflix
+							</ToggleGroupItem>
+							<ToggleGroupItem
+								value="Crunchyroll"
+								className={toogleGroupItemClassName}
+							>
+								Crunchyroll
+							</ToggleGroupItem>
+						</ToggleGroup>
+					</FilterSection>
+				)}
+			</div>
+
+			<div className="flex-shrink-0 p-6 pb-8 bg-[#060d1b]/95 backdrop-blur-md border-t border-white/[0.08] shadow-[0_-10px_30px_rgba(0,0,0,0.5)] z-20">
+				<div className="flex gap-3">
+					<Button
+						onClick={handleApply}
+						disabled={cooldown > 0}
+						className="flex-[2.5] h-11 bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs rounded-xl transition-all duration-300 hover:shadow-[0_0_25px_rgba(139,92,246,0.5)] hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2"
+					>
+						<SlidersHorizontal size={14} />
+						{cooldown > 0 ? `Wait ${cooldown}s...` : "Apply Filters"}
+					</Button>
+					<Button
+						onClick={handleClear}
+						variant="outline"
+						disabled={!disableClear}
+						className="disabled:bg-slate-800 flex-1 h-11 border-white/10 bg-white/[20 hover:bg-white/[8 hover:border-white/[20 text-slate-400 rounded-xl transition-all duration-300"
+					>
+						<RotateCcw size={14} />
+					</Button>
+				</div>
 			</div>
 		</div>
 	);

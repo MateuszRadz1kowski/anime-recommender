@@ -1,8 +1,13 @@
 "use client";
 import { useMemo } from "react";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import {
+	ScrollArea,
+	ScrollAreaViewport,
+	ScrollBar,
+} from "@/components/ui/scroll-area";
 import { Card } from "@/components/ui/card";
 import { Calendar, CalendarDays, Star, Trophy } from "lucide-react";
+import { SectionError } from "@/components/ErrorBanner";
 
 const groupByDecade = (rawData) => {
 	if (!rawData?.data?.MediaListCollection?.lists) return {};
@@ -17,16 +22,15 @@ const groupByDecade = (rawData) => {
 	const grouped = {};
 
 	completedList.forEach((entry) => {
+		if (!entry?.media?.startDate?.year) return;
 		const year = entry.media.startDate.year;
 
-		if (year) {
-			const decade = Math.floor(year / 10) * 10;
-			const decadeLabel = `${decade}s`;
+		const decade = Math.floor(year / 10) * 10;
+		const decadeLabel = `${decade}s`;
 
-			grouped[decadeLabel] = grouped[decadeLabel] || {};
-			grouped[decadeLabel][year] = grouped[decadeLabel][year] || [];
-			grouped[decadeLabel][year].push(entry);
-		}
+		grouped[decadeLabel] = grouped[decadeLabel] || {};
+		grouped[decadeLabel][year] = grouped[decadeLabel][year] || [];
+		grouped[decadeLabel][year].push(entry);
 	});
 
 	return Object.fromEntries(
@@ -40,9 +44,24 @@ const groupByDecade = (rawData) => {
 };
 
 export default function TimelineDecades({ apiData }) {
-	const groupedData = useMemo(() => groupByDecade(apiData), [apiData]);
-	const decades = Object.keys(groupedData);
+	const decadesData = useMemo(() => groupByDecade(apiData), [apiData]);
 
+	if (!apiData || Object.keys(decadesData).length == 0) {
+		return (
+			<Card className="p-6 bg-[#0a0f1d]/85 border border-white/5 mb-4">
+				<div className="flex items-center gap-2 mb-4">
+					<Calendar size={14} className="text-violet-400" />
+					<h3 className="text-sm font-bold text-white uppercase tracking-wider">
+						Timeline Journey
+					</h3>
+				</div>
+				<SectionError
+					errorCode="empty_list"
+					message="No completed anime found in your list to display the timeline."
+				/>
+			</Card>
+		);
+	}
 	return (
 		<div className="space-y-16 pb-24 max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-1000">
 			<header className="relative px-4">
@@ -56,7 +75,7 @@ export default function TimelineDecades({ apiData }) {
 			</header>
 
 			<div className="relative pl-12 border-l border-white/5 ml-8">
-				{decades.map((decadeLabel) => (
+				{Object.keys(decadesData).map((decadeLabel) => (
 					<section key={decadeLabel} className="relative mb-24">
 						<div className="absolute -left-[61px] top-0 flex flex-col items-center">
 							<div className="size-10 rounded-full bg-[#060d1b] border-2 border-violet-500 flex items-center justify-center z-10 shadow-[0_0_20px_rgba(139,92,246,0.3)] group-hover:scale-110 transition-transform">
@@ -68,7 +87,7 @@ export default function TimelineDecades({ apiData }) {
 						</div>
 
 						<div className="space-y-12">
-							{Object.keys(groupedData[decadeLabel]).map((year) => (
+							{Object.keys(decadesData[decadeLabel]).map((year) => (
 								<div key={year} className="relative group">
 									<div className="absolute -left-12 top-4 w-8 h-px bg-white/10 group-hover:w-10 group-hover:bg-fuchsia-500 transition-all duration-500" />
 
@@ -81,7 +100,7 @@ export default function TimelineDecades({ apiData }) {
 
 									<ScrollArea className="w-full whitespace-nowrap pb-4">
 										<div className="flex gap-6">
-											{groupedData[decadeLabel][year].map((entry) => (
+											{decadesData[decadeLabel][year].map((entry) => (
 												<AnimeHistoryCard key={entry.media.id} entry={entry} />
 											))}
 										</div>
