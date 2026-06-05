@@ -12,7 +12,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-	title: "Anime Recommender",
+	title: "Indoga",
 	description: "Your anime recommendation app",
 	other: {
 		"Content-Security-Policy": "upgrade-insecure-requests",

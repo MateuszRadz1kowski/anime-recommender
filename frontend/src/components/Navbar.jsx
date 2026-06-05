@@ -42,7 +42,7 @@ export default function Navbar({ activeTab, onTabChange, apiData }) {
               <Sparkles size={16} className="text-violet-400 group-hover:animate-pulse" />
             </div>
             <span className="text-[16px] font-black text-white tracking-tight uppercase italic">
-              Anime recommender
+              Indoga
             </span>
           </div>
 

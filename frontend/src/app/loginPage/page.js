@@ -84,7 +84,7 @@ export default function LoginPage() {
 							<Sparkles className="w-6 h-6 text-white animate-pulse" />
 						</div>
 						<span className="text-2xl font-black tracking-tighter text-white uppercase italic">
-							Anime Recommender
+							Indoga
 						</span>
 					</div>
 					<h1 className="text-2xl font-bold text-white mb-1">Welcome</h1>
@@ -193,7 +193,7 @@ export default function LoginPage() {
 					style={{ color: "oklch(0.55 0.02 265)" }}
 				>
 					<a
-						href="https://github.com/MateuszRadz1kowski/anime-recommender"
+						href="https://github.com/MateuszRadz1kowski/Indoga"
 						target="_blank"
 						rel="noopener noreferrer"
 						className="hover:text-purple-400"

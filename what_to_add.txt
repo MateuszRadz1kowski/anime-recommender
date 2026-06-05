@@ -110,9 +110,9 @@ DOCKER
     kontener z fastapi w ktorym jest backend w pythonie ktory zwraca rekomendacje
 
     QUICK CHEETSHEET
-        na poczatek pobrac z githuba repo git clone https://github.com/MateuszRadz1kowski/anime-recommender
+        na poczatek pobrac z githuba repo git clone https://github.com/MateuszRadz1kowski/indoga
         tam gdzie sa wazne pliki ktore sa w gitignore, recznie dodac relevant dane (np .env)
-        pozniej w folderze anime-recommender aktywowac Dockerfile i stworzyc kontenery dockera - docker compose up --build -d
+        pozniej w folderze indoga aktywowac Dockerfile i stworzyc kontenery dockera - docker compose up --build -d
         logi danego konteneru: docker compose logs -f backend
         baze danych aktualnie trzeba recznie stworzyc:
             najpierw by rozmawiac z kontenerem anime_db - docker exec -it anime_db psql -U (nazwa usera) -d (nazwa bazy danych)
