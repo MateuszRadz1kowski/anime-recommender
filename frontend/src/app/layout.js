@@ -69,15 +69,15 @@ export const metadata = {
 		title: "Indoga — Discover Anime & Manga Matched to Your Taste",
 		description:
 			"Personalized anime and manga recommendations based on your AniList or MyAnimeList profile",
-		// images: [
-		// 	{
-		// 		url: "/logo.png",
-		// 		width: 1200,
-		// 		height: 630,
-		// 		alt: "Indoga — Personalized Anime Discovery",
-		// 		type: "image/png",
-		// 	},
-		// ],
+		images: [
+			{
+				url: "/indoga_logo.jpg",
+				width: 620,
+				height: 800,
+				alt: "Indoga — Personalized Anime Discovery",
+				type: "image/jpg",
+			},
+		],
 		locale: "en_US",
 	},
 
@@ -86,7 +86,7 @@ export const metadata = {
 		title: "Indoga — Personalized Anime Discovery",
 		description:
 			"Personalized anime and manga recommendations based on your AniList or MyAnimeList profile",
-		// images: ["/logo.png"],
+		images: ["/indoga_image_logo.jpg"],
 		creator: "@Radz1k69",
 	},
 
@@ -114,33 +114,23 @@ export const metadata = {
 		},
 	},
 
-	// icons: {
-	// 	icon: [
-	// 		{ url: "/icons/icon-32x32.png", sizes: "32x32", type: "image/png" }, // favicon
-	// 		{ url: "/icons/icon-96x96.png", sizes: "96x96", type: "image/png" }, // desktop
-	// 	],
-	// 	apple: [
-	// 		{
-	// 			url: "/icons/apple-touch-icon.png",
-	// 			sizes: "180x180",
-	// 			type: "image/png",
-	// 		},
-	// 	],
-	// 	other: [
-	// 		{
-	// 			rel: "mask-icon",
-	// 			url: "/icons/safari-pinned-tab.svg",
-	// 			color: "#7c3aed",
-	// 		},
-	// 	],
-	// },
+	icons: {
+		icon: [{ url: "/indoga_logo.jpg", sizes: "any", type: "image/jpeg" }],
+		apple: [
+			{
+				url: "/indoga_logo.jpg",
+				sizes: "180x180",
+				type: "image/jpeg",
+			},
+		],
+	},
 
 	manifest: "/manifest.json",
-
-	// verification: {
-	//   google: "twoj-token-z-search-console",
-	// },
 };
+
+// verification: {
+//   google: "twoj-token-z-search-console",
+// },
 
 export const viewport = {
 	themeColor: [
@@ -159,36 +149,12 @@ export default function RootLayout({ children }) {
 		<html lang="en">
 			<head>
 				<meta name="mobile-web-app-capable" content="yes" />
-
 				<meta name="apple-mobile-web-app-capable" content="yes" />
-
 				<meta
 					name="apple-mobile-web-app-status-bar-style"
 					content="black-translucent"
 				/>
-
 				<meta name="apple-mobile-web-app-title" content="Indoga" />
-
-				{/* ── Splash screens dla iOS ───────────────────────────
-            Obrazy wyświetlane podczas uruchamiania PWA na iPhone/iPad
-            Każdy media query odpowiada konkretnemu modelowi urządzenia
-            Stwórz pliki w frontend/public/splash/ lub użyj narzędzia
-            https://progressier.com/pwa-screenshots-and-ios-splash-screen-generator */}
-				{/* <link
-					rel="apple-touch-startup-image"
-					href="/splash/splash-1170x2532.png"
-					media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)"
-				/>
-				<link
-					rel="apple-touch-startup-image"
-					href="/splash/splash-1125x2436.png"
-					media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)"
-				/>
-				<link
-					rel="apple-touch-startup-image"
-					href="/splash/splash-750x1334.png"
-					media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)"
-				/> */}
 
 				<script
 					type="application/ld+json"
@@ -213,6 +179,7 @@ export default function RootLayout({ children }) {
 								url: "https://github.com/MateuszRadz1kowski",
 							},
 							softwareVersion: "1.0.0",
+							image: `${BASE_URL}indoga_logo.jpg`,
 						}),
 					}}
 				/>

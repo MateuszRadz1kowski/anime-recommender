@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { Search, Sparkles, Loader2 } from "lucide-react";
+import { Search, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -126,22 +126,22 @@ export default function LoginPage() {
 			</div>
 
 			<div className="relative w-full max-w-md z-10">
-				<div className="text-center mb-8 group cursor-default">
-					<div className="inline-flex items-center gap-3 mb-3">
-						<div
-							className="w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-700 group-hover:rotate-[360deg] group-hover:scale-110 shadow-lg"
-							style={{
-								background: "oklch(0.65 0.25 290)",
-								boxShadow: "0 0 25px oklch(0.65 0.25 290 / 0.4)",
-							}}
-						>
-							<Sparkles className="w-6 h-6 text-white animate-pulse" />
-						</div>
-						<span className="text-2xl font-black tracking-tighter text-white uppercase italic">
-							Indoga
-						</span>
+				<div className="text-center mb-10 group cursor-default flex flex-col items-center">
+					<div className="relative w-32 h-32 mb-1 transition-transform duration-700 group-hover:scale-105">
+						<div className="absolute inset-0 bg-purple-500/30 rounded-full blur-[35px] opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+						<Image
+							src="/Indoga_image_logo.jpg"
+							alt="Indoga Logo"
+							fill
+							sizes="(max-width: 128px) 100vw, 128px"
+							className="object-contain mix-blend-screen"
+							priority
+						/>
 					</div>
-					<h1 className="text-2xl font-bold text-white mb-1">Welcome</h1>
+
+					<h1 className="text-3xl font-black tracking-[0.25em] text-transparent bg-clip-text bg-gradient-to-br from-white via-purple-200 to-purple-500 uppercase ml-2 mb-2">
+						Indoga
+					</h1>
 					<p className="text-sm font-medium opacity-60 text-slate-300">
 						Connect your anime profile to get started
 					</p>
